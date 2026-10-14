@@ -2,7 +2,7 @@
 // Created by alexis on 12/07/2026.
 //
 
-#ifndef MOTEUR_GRAPHIQUE_TEST_H
+#ifndef MOTEUR_GRAPHIQUE_H
 #define MOTEUR_GRAPHI// mat3_make_rotY, mat3_mul_vec3, etc.
 
 typedef struct {
@@ -44,6 +44,7 @@ typedef struct {
 Mat3  mat3_rot_y(double angle);
 Mat3  mat3_rot_x(double angle);
 Mat3  mat3_rot_z(double angle);
+
 Vec3  mat3_mul(const Mat3 m, Vec3 v);
 Cube  cube_make(double size);          // crée un cube centré sur 0
 Cube  cube_transform(const Cube c, const Mat3 matProjection);
@@ -59,4 +60,4 @@ Mat4 projectionMatrix();
 
 
 
-#endif //MOTEUR_GRAPHIQUE_TEST_H
+#endif //MOTEUR_GRAPHIQUE_H

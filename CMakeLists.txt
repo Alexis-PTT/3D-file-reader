@@ -4,13 +4,13 @@ find_package(SDL3 REQUIRED)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(moteur main.c
-        test.c)
+add_executable(moteur
+        3DMotor.c)
 
 add_executable(testWindows
         exGraphic.c
-        test.c
-        test.h
+        3DMotor.c
+        3DMotor.h
 )
 
 target_link_libraries(moteur PRIVATE m)

@@ -2,7 +2,7 @@
 // Created by alexis on 12/07/2026.
 //
 
-#include "test.h"
+#include "3DMotor.h"
 #include <math.h>
 #include <stdio.h>
 const int fovX = 50;
@@ -44,7 +44,7 @@ Mat4 projectionMatrix(){
     return m;
 }
 
-Vec4 mat4_mul(Mat4 *m, Vec4 v) {// it a 4*4 matrix for later (things like raytracing,opacacity..? )
+Vec4 mat4_mul(Mat4 *m, Vec4 v) {
     Vec4 out;
     for (int row = 0; row < 4; row++) {
         double cpt = 0;
@@ -52,7 +52,7 @@ Vec4 mat4_mul(Mat4 *m, Vec4 v) {// it a 4*4 matrix for later (things like raytra
             cpt += m->m[col][row] * v.pos[col];
         out.pos[row] = cpt;
     }
-    return out;  // retourne par valeur, plus propre
+    return out;
 }
 
 
@@ -64,16 +64,16 @@ Vec3 mat3_mul(const Mat3 m, Vec3 v) {
             cpt += m.m[col][row] * v.pos[row];
         out.pos[col] = cpt;
     }
-    return out;  // retourne par valeur, plus propre
+    return out;
 }
-Triangle triangle_final(Triangle *t,Mat4 *projection3D) {
+Triangle triangle_final(Triangle *t,Mat4 *projection3D) { //TODO : change name to something like vertexVisual projection
     Triangle out;
     for(int j =0 ; j < 3; j++)
     {
         Vec4 inputV={t->points[j].pos[0],
-            t->points[j].pos[1],
-        t->points[j].pos[2],
-        1};
+                    t->points[j].pos[1],
+                    t->points[j].pos[2],
+                    1};
         Vec4 nVec=mat4_mul(projection3D,inputV);
         out.points[j].pos[0]=nVec.pos[0]/nVec.pos[2];
         out.points[j].pos[1]=nVec.pos[1]/nVec.pos[2];
@@ -91,7 +91,6 @@ Triangle triangle_final(Triangle *t,Mat4 *projection3D) {
 
 Cube cube_make(double size) {
     double h = size / 2.0;
-    //mesh of triangles to make a cube
     Cube c = {{
         //point(x y z)
         //south
@@ -116,7 +115,7 @@ Cube cube_make(double size) {
     return c;
 }
 
-Cube cube_transform(Cube c,Mat3 matProjection) {
+Cube cube_transform(Cube c,Mat3 matProjection) {//TODO : more explicit name
     Cube m = {{}};
     Triangle t={};
     for(int i =0 ; i < 12; i++) {

@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test.h"
+#include "3DMotor.h"
 #include<unistd.h>
 #include <math.h>
 
 Vec3 lightVec={0.0F,0.0F,-1.0F};
+
 void printCube(Cube c)
 {
     for (int i = 0; i < 12; ++i)
@@ -147,9 +148,57 @@ Cube calculCube(Cube c,Camera *cam,Mat4 *proj3D,SDL_Renderer *rendu)
 
     return projectionC;
 }
+//TODO : cam in global variable ?
+void sdlEventCommands(Camera *cam,SDL_Event *e,int *isOpen)
+{
+    if (e->type == SDL_EVENT_QUIT) {
+        *isOpen=0;
+    }
+    if (e->type == SDL_EVENT_KEY_DOWN) {
+        switch (e->key.key){
+        case SDLK_ESCAPE:
+            *isOpen=0;
+            break;
+            //camera rotation
+        case SDLK_Q:
+            cam_turn( cam, 'y', 0.03);
+            //projC2=calculCube(c2,&cam,proj3D);
+            break;
+        case SDLK_D:
+            cam_turn( cam, 'y', -0.03);
+            break;
+        case SDLK_Z:
+            cam_turn( cam, 'x', 0.03);
+            break;
+        case SDLK_S:
+            cam_turn( cam, 'x', -0.03);
+            break;
+            //TODO : camera movements
+
+        // case SDLK_DOWN:
+        //     cam_move( cam, 'f', 1);
+        //
+        //     break;
+        // case SDLK_UP:
+        //     cam_turn( cam, 'y', -0.03);
+        //     break;
+        // case SDLK_LEFT:
+        //     cam_turn( cam, 'x', 0.03);
+        //     break;
+        // case SDLK_RIGHT:
+        //     cam_turn( cam, 'x', -0.03);
+        //     break;
+
+        default:
+            break;
+        }
+    }
+}
+
 
 
 int main(int argc, char *argv[]) {
+    //init screen
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         printf("Erreur SDL_Init : %s\n", SDL_GetError());
         return 1;
@@ -172,19 +221,16 @@ int main(int argc, char *argv[]) {
         return 1;
 
     }
-
     int isOpen = 1;
     SDL_Event e;
-    Cube c,c2,c3;
-
     SDL_SetRenderLogicalPresentation(rendu,600,400,SDL_LOGICAL_PRESENTATION_STRETCH);
+
+    //3D object init
+    Cube c,c2,c3;
     Mat4 proj3D=projectionMatrix();
-    printf("%f",proj3D.m[0][0]);
-    printf("%f",proj3D.m[1][1]);
     Camera cam = {0,0,0,0,0,0};
     c = cube_make(1);
     c2 = cube_make(1);
-
     c3 = cube_make(1);
     cube_move(&c2 ,1,0);
     cube_move(&c3 ,1,2);
@@ -192,77 +238,31 @@ int main(int argc, char *argv[]) {
     //Cube projC2=calculCube(c2,&cam,proj3D);
     //Cube projC3=calculCube(c3,&cam,proj3D);
 
+    //light vec init
     double val=lightVec.pos[0]*lightVec.pos[0]+
                         lightVec.pos[1]*lightVec.pos[1]+
                         lightVec.pos[2]*lightVec.pos[2];
     const double res2 =sqrt(val);
-
-    //printf(" test %f",res2);
     lightVec.pos[0]/=res2;
     lightVec.pos[1]/=res2;
     lightVec.pos[2]/=res2;
 
 
-
-
     while (isOpen!=0)
     {
+        //treat sdl events (windows interactions and keyboard for now)
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_EVENT_QUIT) {
-                isOpen = 0;
-            }
-            if (e.type == SDL_EVENT_KEY_DOWN) {
-                switch (e.key.key){
-                    case SDLK_ESCAPE:
-                        isOpen=0;
-                        break;
-                    //camera rotation
-                    case SDLK_Q:
-                        cam_turn( &cam, 'y', 0.03);
-                        //projC2=calculCube(c2,&cam,proj3D);
-                        break;
-                    case SDLK_D:
-                        cam_turn( &cam, 'y', -0.03);
-                        break;
-                    case SDLK_Z:
-                        cam_turn( &cam, 'x', 0.03);
-                        break;
-                    case SDLK_S:
-                        cam_turn( &cam, 'x', -0.03);
-                        break;
-                    //camera mouvement
-                    case SDLK_DOWN:
-                        cam_move( &cam, 'f', 1);
-
-                        break;
-                    case SDLK_UP:
-                        cam_turn( &cam, 'y', -0.03);
-                        break;
-                    case SDLK_LEFT:
-                        cam_turn( &cam, 'x', 0.03);
-                        break;
-                    case SDLK_RIGHT:
-                        cam_turn( &cam, 'x', -0.03);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
+            sdlEventCommands(&cam,&e,&isOpen);
         }
-
         //usleep(30000);
         //printf("TEST2\n");
         SDL_SetRenderDrawColor(rendu, 0, 0, 0, 255);
         SDL_RenderClear(rendu);
         SDL_SetRenderDrawColor(rendu, 255, 255, 255, 255);
 
-        //TODO : faire le parallelisme dans cette partie d'affichage
+        //TODO : show the vertexs in parallelism
         //showTriangle(rendu,&projC2);
         //showTriangle(rendu,&projC3);
-
-
         calculCube(c,&cam,&proj3D,rendu);
         SDL_RenderPresent(rendu);
         //projC2=calculCube(c2,&cam,proj3D);
